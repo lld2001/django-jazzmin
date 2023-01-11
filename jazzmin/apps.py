@@ -6,6 +6,6 @@ __all__ = ["JazzminConfig"]
 
 
 class JazzminConfig(AppConfig):
-    name = "jazzmin"
+    name = "jazzmin.jazzmin"
     label = "jazzmin"
     verbose_name = "Jazzmin"
