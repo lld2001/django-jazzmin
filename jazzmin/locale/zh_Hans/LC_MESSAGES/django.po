@@ -76,3 +76,6 @@ msgstr "删除了“{object}”。"
 #, python-brace-format
 msgid "Could not reverse url from {instance}"
 msgstr "无法从{instance}中反转URL"
+
+msgid "General"
+msgstr "常规"
