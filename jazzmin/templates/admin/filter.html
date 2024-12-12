@@ -1,15 +1,27 @@
 {% load i18n %}
 
+{% if choices|length > 0 %}
 <div class="form-group">
     <select class="form-control search-filter" style="width: 100%;" tabindex="-1" aria-hidden="true" data-name="{{ field_name }}">
         <option value="">{{ title }}</option>
         <option value="">---------</option>
         {% for choice in choices %}
             {% if choice.name %}
-                <option data-name="{{ choice.name }}" value="{{ choice.value }}" {% if choice.selected %}selected {% endif %}>
-                    {{ choice.display }}
-                </option>
+              <option data-name="{{ choice.name }}" value="{{ choice.value }}" {% if choice.selected %}selected {% endif %}>
+                {{ choice.display }}
+              </option>
             {% endif %}
         {% endfor %}
     </select>
 </div>
+
+{% else %}
+
+<div class="form-group row">
+  <label for="{{ field_name }}" class="col-sm-4 form-control-sm">{{ title }}:</label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" id="{{ field_name }}" name="{{ field_name }}" placeholder="{{ title }}" value="{{ lookup_val }}">
+    </div>
+</div>
+
+{% endif %}

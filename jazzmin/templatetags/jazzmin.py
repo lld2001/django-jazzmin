@@ -28,7 +28,13 @@ from django.utils.translation import gettext
 
 from .. import version
 from ..settings import CHANGEFORM_TEMPLATES, get_settings, get_ui_tweaks
-from ..utils import get_admin_url, get_filter_id, has_fieldsets_check, make_menu, order_with_respect_to
+from ..utils import (
+    get_admin_url,
+    get_filter_id,
+    has_fieldsets_check,
+    make_menu,
+    order_with_respect_to,
+)
 
 User = get_user_model()
 register = Library()
@@ -67,13 +73,17 @@ def get_side_menu(context: Context, using: str = "available_apps") -> List[Dict]
 
         menu_items = []
         for model in app.get("models", []):
-            model_str = "{app_label}.{model}".format(app_label=app_label, model=model["object_name"]).lower()
+            model_str = "{app_label}.{model}".format(
+                app_label=app_label, model=model["object_name"]
+            ).lower()
             if model_str in options.get("hide_models", []):
                 continue
 
             model["url"] = model["admin_url"]
             model["model_str"] = model_str
-            model["icon"] = options["icons"].get(model_str, options["default_icon_children"])
+            model["icon"] = options["icons"].get(
+                model_str, options["default_icon_children"]
+            )
             menu_items.append(model)
 
         menu_items.extend(app_custom_links)
@@ -81,7 +91,8 @@ def get_side_menu(context: Context, using: str = "available_apps") -> List[Dict]
         custom_link_names = [x.get("name", "").lower() for x in app_custom_links]
         model_ordering = list(
             filter(
-                lambda x: x.lower().startswith("{}.".format(app_label)) or x.lower() in custom_link_names,
+                lambda x: x.lower().startswith("{}.".format(app_label))
+                or x.lower() in custom_link_names,
                 ordering,
             )
         )
@@ -98,7 +109,9 @@ def get_side_menu(context: Context, using: str = "available_apps") -> List[Dict]
 
     if ordering:
         apps_order = list(filter(lambda x: "." not in x, ordering))
-        menu = order_with_respect_to(menu, apps_order, getter=lambda x: x["app_label"].lower())
+        menu = order_with_respect_to(
+            menu, apps_order, getter=lambda x: x["app_label"].lower()
+        )
 
     return menu
 
@@ -109,7 +122,13 @@ def get_top_menu(user: AbstractUser, admin_site: str = "admin") -> List[Dict]:
     Produce the menu for the top nav bar
     """
     options = get_settings()
-    return make_menu(user, options.get("topmenu_links", []), options, allow_appmenus=True, admin_site=admin_site)
+    return make_menu(
+        user,
+        options.get("topmenu_links", []),
+        options,
+        allow_appmenus=True,
+        admin_site=admin_site,
+    )
 
 
 @register.simple_tag
@@ -118,7 +137,13 @@ def get_user_menu(user: AbstractUser, admin_site: str = "admin") -> List[Dict]:
     Produce the menu for the user dropdown
     """
     options = get_settings()
-    return make_menu(user, options.get("usermenu_links", []), options, allow_appmenus=False, admin_site=admin_site)
+    return make_menu(
+        user,
+        options.get("usermenu_links", []),
+        options,
+        allow_appmenus=False,
+        admin_site=admin_site,
+    )
 
 
 @register.simple_tag
@@ -186,7 +211,9 @@ def get_user_avatar(user: AbstractUser) -> str:
         elif callable(avatar_field):
             return avatar_field()
 
-    logger.warning("avatar field must be an ImageField/URLField on the user model, or a callable")
+    logger.warning(
+        "avatar field must be an ImageField/URLField on the user model, or a callable"
+    )
 
     return no_avatar
 
@@ -203,23 +230,23 @@ def jazzmin_paginator_number(change_list: ChangeList, i: int) -> SafeText:
     current_page = i == change_list.page_num
 
     if start:
-        link = change_list.get_query_string({PAGE_VAR: change_list.page_num - 1}) if change_list.page_num > 1 else "#"
+        link = (
+            change_list.get_query_string({PAGE_VAR: change_list.page_num - 1})
+            if change_list.page_num > 1
+            else "#"
+        )
         html_str += """
         <li class="page-item previous {disabled}">
             <a class="page-link" href="{link}" data-dt-idx="0" tabindex="0">«</a>
         </li>
-        """.format(
-            link=link, disabled="disabled" if link == "#" else ""
-        )
+        """.format(link=link, disabled="disabled" if link == "#" else "")
 
     if current_page:
         html_str += """
         <li class="page-item active">
             <a class="page-link" href="javascript:void(0);" data-dt-idx="3" tabindex="0">{num}</a>
         </li>
-        """.format(
-            num=i
-        )
+        """.format(num=i)
     elif spacer:
         html_str += """
         <li class="page-item">
@@ -233,19 +260,19 @@ def jazzmin_paginator_number(change_list: ChangeList, i: int) -> SafeText:
             <li class="page-item">
             <a href="{query_string}" class="page-link {end}" data-dt-idx="3" tabindex="0">{num}</a>
             </li>
-        """.format(
-            num=i, query_string=query_string, end=end
-        )
+        """.format(num=i, query_string=query_string, end=end)
 
     if end:
-        link = change_list.get_query_string({PAGE_VAR: change_list.page_num + 1}) if change_list.page_num < i else "#"
+        link = (
+            change_list.get_query_string({PAGE_VAR: change_list.page_num + 1})
+            if change_list.page_num < i
+            else "#"
+        )
         html_str += """
         <li class="page-item next {disabled}">
             <a class="page-link" href="{link}" data-dt-idx="7" tabindex="0">»</a>
         </li>
-        """.format(
-            link=link, disabled="disabled" if link == "#" else ""
-        )
+        """.format(link=link, disabled="disabled" if link == "#" else "")
 
     return format_html(html_str)
 
@@ -255,7 +282,9 @@ def admin_extra_filters(cl: ChangeList) -> Dict:
     """
     Return the dict of used filters which is not included in list_filters form
     """
-    used_parameters = list(itertools.chain(*(s.used_parameters.keys() for s in cl.filter_specs)))
+    used_parameters = list(
+        itertools.chain(*(s.used_parameters.keys() for s in cl.filter_specs))
+    )
     return dict((k, v) for k, v in cl.params.items() if k not in used_parameters)
 
 
@@ -299,7 +328,15 @@ def jazzmin_list_filter(cl: ChangeList, spec: ListFilter) -> SafeText:
                 choice["value"] = value
             i += 1
 
-    return tpl.render({"field_name": field_key, "title": spec.title, "choices": choices, "spec": spec})
+    return tpl.render(
+        {
+            "field_name": field_key,
+            "title": spec.title,
+            "choices": choices,
+            "spec": spec,
+            "lookup_val": spec.lookup_val,
+        }
+    )
 
 
 @register.simple_tag
@@ -340,7 +377,9 @@ def get_sections(
 
     if hasattr(admin_form.model_admin, "jazzmin_section_order"):
         fieldsets = order_with_respect_to(
-            fieldsets, admin_form.model_admin.jazzmin_section_order, getter=lambda x: x.name
+            fieldsets,
+            admin_form.model_admin.jazzmin_section_order,
+            getter=lambda x: x.name,
         )
 
     return fieldsets
@@ -494,24 +533,51 @@ def action_message_to_list(action: LogEntry) -> List[Dict]:
             if "added" in sub_message:
                 if sub_message["added"]:
                     sub_message["added"]["name"] = gettext(sub_message["added"]["name"])
-                    messages.append(added(gettext("Added {name} “{object}”.").format(**sub_message["added"])))
+                    messages.append(
+                        added(
+                            gettext("Added {name} “{object}”.").format(
+                                **sub_message["added"]
+                            )
+                        )
+                    )
                 else:
                     messages.append(added(gettext("Added.")))
 
             elif "changed" in sub_message:
                 sub_message["changed"]["fields"] = get_text_list(
-                    [gettext(field_name) for field_name in sub_message["changed"]["fields"]],
+                    [
+                        gettext(field_name)
+                        for field_name in sub_message["changed"]["fields"]
+                    ],
                     gettext("and"),
                 )
                 if "name" in sub_message["changed"]:
-                    sub_message["changed"]["name"] = gettext(sub_message["changed"]["name"])
-                    messages.append(changed(gettext("Changed {fields}.").format(**sub_message["changed"])))
+                    sub_message["changed"]["name"] = gettext(
+                        sub_message["changed"]["name"]
+                    )
+                    messages.append(
+                        changed(
+                            gettext("Changed {fields}.").format(
+                                **sub_message["changed"]
+                            )
+                        )
+                    )
                 else:
-                    messages.append(changed(gettext("Changed {fields}.").format(**sub_message["changed"])))
+                    messages.append(
+                        changed(
+                            gettext("Changed {fields}.").format(
+                                **sub_message["changed"]
+                            )
+                        )
+                    )
 
             elif "deleted" in sub_message:
                 sub_message["deleted"]["name"] = gettext(sub_message["deleted"]["name"])
-                messages.append(deleted(gettext("Deleted “{object}”.").format(**sub_message["deleted"])))
+                messages.append(
+                    deleted(
+                        gettext("Deleted “{object}”.").format(**sub_message["deleted"])
+                    )
+                )
 
     return messages if len(messages) else [changed(gettext(action.change_message))]
 
