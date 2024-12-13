@@ -20,7 +20,7 @@
 <div class="form-group row">
   <label for="{{ field_name }}" class="col-sm-4 form-control-sm">{{ title }}:</label>
     <div class="col-sm-8">
-      <input type="text" class="form-control" id="{{ field_name }}" name="{{ field_name }}" placeholder="{{ title }}" value="{{ lookup_val }}">
+      <input type="text" class="form-control" id="{{ field_name }}" name="{{ field_name }}" placeholder="{{ title }}" value="{{ lookup_val|default:"" }}">
     </div>
 </div>
 
