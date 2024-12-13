@@ -327,14 +327,14 @@ def jazzmin_list_filter(cl: ChangeList, spec: ListFilter) -> SafeText:
                 choice["name"] = key
                 choice["value"] = value
             i += 1
-
+    lookup_val = spec.lookup_val if hasattr(spec, "lookup_val") else None
     return tpl.render(
         {
             "field_name": field_key,
             "title": spec.title,
             "choices": choices,
             "spec": spec,
-            "lookup_val": spec.lookup_val,
+            "lookup_val": lookup_val,
         }
     )
 
